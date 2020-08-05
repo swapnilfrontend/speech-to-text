@@ -1,0 +1,427 @@
+// Copyright 2018 i2x GmbH.
+
+syntax = "proto3";
+package vibe;
+
+option cc_enable_arenas = true;
+
+// The top-level message that gets sent from client to the server.
+// First message sent to the system must be of type RecognitionConfig.
+// All subsequent messages must be of type StreamingRequest.
+message RecognizeRequest {
+  oneof input_msg_type {
+    RecognitionConfig initial_config = 1;
+
+    StreamingRequest streaming_request = 2;
+  }
+}
+
+message SessionInfo {
+  enum Source {
+    MICROPHONE = 0;
+    SYSTEM = 1;
+  }
+
+  string call_id = 1;
+
+  Source source = 2;
+
+  string source_description = 3;
+
+  uint32 incall_recognition_session_number = 4;
+
+  string call_detection_session_id = 5;
+}
+
+// Provides information about system for the vibe backend
+// Equal to the SystemInformation in listener but without the secret key
+message SystemInfo {
+  string username = 1;
+
+  string company_name = 2;
+
+  string country = 3;
+
+  string comments = 4;
+
+  string unique_id = 5;
+}
+
+// Provides information to the recognizer that specifies how to process the
+// request. Must be the first message sent to the recognizer.
+message RecognitionConfig {
+  // Audio encoding of the data sent in the audio message. All encodings support
+  // only 1 channel (mono) audio. Raw audio bytes without header are expected.
+  enum AudioEncoding {
+    // Uncompressed 16-bit signed little-endian samples (Linear PCM).
+    LINEAR16 = 0;
+  }
+
+  // *Required* Encoding of audio data sent in all `RecognitionAudio` messages.
+  AudioEncoding encoding = 1;
+
+  // *Required* Sample rate in Hertz of the audio data sent in all
+  // `StreamingRequest` audio messages. Valid values are: 8000-48000.
+  // 16000 is optimal. For best results, set the sampling rate of the audio
+  // source to 16000 Hz. If that's not possible, use the native sample rate of
+  // the audio source (instead of re-sampling).
+  int32 sample_rate_hertz = 2;
+
+  // *Required* The language of the supplied audio as a
+  // [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+  // Example: "en-US".
+  string language_code = 3;
+
+  ASRVendors asr_vendors = 4;
+
+  // *Optional* Maximum number of recognition hypotheses to be returned.
+  // Specifically, the maximum number of `SpeechRecognitionAlternative` messages
+  // within each `SpeechRecognitionResult`.
+  // The server may return fewer than `max_alternatives`.
+  // Valid values are `0`-`30`. A value of `0` or `1` will return a maximum of
+  // one. If omitted, will return a maximum of one.
+  int32 max_alternatives = 5;
+
+  bool enable_interim_results = 6;
+
+  bool enable_phrase_spotting_for_interim_results = 7;
+
+  // *Optional* Enables inverse text normalization.
+  // This includes for instance restoring punctuation, words capitalization,
+  // formatting entities like numbers, dates, times, etc.
+  // The result could be found in `normalized_transcript` field of `SpeechRecognitionAlternative` message.
+  // Note: not all features of inverse text normalization are supported for every languages or vendor
+  bool enable_inverse_normalization = 8;
+
+  enum OperationMode {
+    RECOGNITION = 0;
+    ALIGNMENT = 1;
+  }
+
+  OperationMode mode = 9;
+
+  GrammarHints grammar_hints = 10;
+
+  // *Optional* Session info represents information about different recognition sessions in a logical call.
+  SessionInfo session_info = 11;
+
+  // *Optional* System information from the daemon
+  SystemInfo system_info = 12;
+
+  // Enable personal data anonymization
+  bool enable_anonymization = 13;
+}
+
+message ASRVendors {
+  I2XASRConfig i2x = 1;
+
+  GoogleASRConfig google = 2;
+
+  message I2XASRConfig {
+    bool enabled = 1;
+
+    string lingware_topic = 2;
+
+    LingwareVersion lingware_version = 3;
+
+    message LingwareVersion {
+      bool is_specified = 1;
+      uint32 major = 2;
+      uint32 minor = 3;
+      uint32 patch = 4;
+    }
+  }
+
+  message GoogleASRConfig {
+    bool enabled = 1;
+  }
+}
+
+// Grammar represented by a list of sentences (lists of strings)
+message GrammarHints {
+  message LinearGrammar {
+    repeated string words = 1;
+  }
+  repeated LinearGrammar linear_grammars = 1;
+}
+
+message StreamingRequest {
+  oneof streaming_request_type {
+    bytes audio_chunk = 1;
+
+    FinalizationToken finalization_token = 2;
+
+    PhraseSpottingConfig phrase_spotting_config = 3;
+
+    AudioChunkWithMetadata audio_chunk_with_metadata = 4;
+  }
+}
+
+message AudioChunkWithMetadata {
+  bytes audio_chunk = 1;
+
+  enum Channel {
+    UNKNOWN = 0;
+    MICROPHONE = 1;
+    SYSTEM = 2;
+  }
+
+  Channel channel = 2;
+}
+
+message FinalizationToken {
+  bool forget_this_session = 1;
+
+  uint64 session_offset_msec = 2;
+}
+
+message PhraseSpottingConfig {
+  message PhraseSpottingEntry {
+    string tag = 1;
+
+    repeated Phrase phrases = 2;
+
+    bool handle_as_filler_phrase = 3;
+  }
+
+  repeated PhraseSpottingEntry entries = 1;
+}
+
+message Phrase {
+  string text = 1;
+  // Precalculated relative frequency of the phrase in a text corpus. This is considered the
+  // normale i.e. baseline use of the word. The value is derived with the following formula:
+  // phrase_count_in_corpus / total_words_in_corpus
+  float relative_baseline_frequency = 2;
+
+  uint32 min_phrase_count = 3;
+  // The minimum ratio between the relative frequency of a phrase in a given transcripts and
+  // and the respective relative baseline frequency.
+  float min_phrase_frequency_ratio = 4;
+
+  PhraseProperties phrase_properties = 5;
+}
+
+message PhraseProperties {
+  string phrase_group_name = 1;
+
+  double points = 2;
+}
+
+// The top-level message that gets sent from server to the client.
+message RecognizeResponse {
+  oneof output_msg_type {
+    ResultsMessage results_message = 1;
+
+    ServiceMessage service_message = 2;
+  }
+}
+
+message ResultsMessage {
+  oneof results_msg_type {
+    SpeechRecognitionResult asr_result = 1;
+
+    VoiceMetrics voice_metrics = 2;
+
+    CallDetectionResult call_detection_result = 3;
+  }
+}
+
+// A streaming speech recognition result corresponding to a portion of the audio
+// that is currently being processed.
+message SpeechRecognitionResult {
+  oneof asr_result_type {
+    // *Output-only* May contain one or more recognition hypotheses (up to the
+    // maximum specified in `max_alternatives`).
+    SpeechRecognitionResultFinal final = 1;
+
+    SpeechRecognitionResultPartial partial = 2;
+  }
+
+  repeated PhraseSpottingResult phrase_spotting_result = 3;
+
+  Timings timings = 4;
+
+  enum Vendor {
+    UNDEFINED = 0;
+    I2X = 1;
+    GOOGLE = 2;
+  }
+
+  Vendor vendor = 5;
+}
+
+message Timings {
+  uint32 utterance_id = 1;
+
+  uint32 response_id = 2;
+
+  uint32 utterance_start_time_msec = 3;
+
+  uint32 current_time_offset_msec = 4;
+}
+
+message SpeechRecognitionResultFinal {
+  repeated SpeechRecognitionAlternative alternatives = 1;
+}
+
+message SpeechRecognitionResultPartial {
+  // *Output-only* Transcript text representing the words that the user spoke.
+  string transcript = 1;
+
+  float words_per_minute = 2;
+}
+
+// Alternative hypotheses (a.k.a. n-best list).
+message SpeechRecognitionAlternative {
+  // *Output-only* Transcript text representing the words that the user spoke.
+  string transcript = 1;
+
+  // *Output-only* The confidence estimate, up to max 1.0. A higher number
+  // indicates an estimated greater likelihood that the recognized words are
+  // correct. This field is typically provided only for `utterance_is_finalized=true` results.
+  // Clients should not rely on the `confidence` field as it is not guaranteed to be accurate or consistent.
+  // Can be negative.
+  // The default of 0.0 is a sentinel value indicating `confidence` was not set.
+  float confidence = 2;
+
+  // *Output-only* A list of word-specific information for each recognized word.
+  // This field is typically provided only for `utterance_is_finalized=true` results.
+  repeated WordInfo words = 3;
+
+  float words_per_minute = 4;
+
+  // *Output-only* Transcript with inverse text normalization.
+  // To enable inverse text normalization set the field `enable_inverse_normalization` in `RecognitionConfig` message.
+  // When inverse text normalization is not enabled, this field is a copy of `transcript` field.
+  string normalized_transcript = 5;
+}
+
+// Detailed information about single phones.
+message Phone {
+  string phone = 1;
+
+  uint32 duration_msec = 2;
+
+  repeated float loglike_diff = 3;
+
+  message ValidationResult {
+    float validation_score = 1;
+
+    enum ValidationReturnCode {
+      OK = 0;
+      NOT_REQUESTED = 1;
+      NO_MODEL = 2;
+      EMPTY_PHONE = 3;
+    }
+    ValidationReturnCode validation_return_code = 2;
+  }
+
+  ValidationResult validation_result = 4;
+}
+
+// Word-specific information for recognized words.
+message WordInfo {
+  // *Output-only* Time offset relative to the beginning of the audio,
+  // and corresponding to the start of the spoken word.
+  uint32 start_time_msec = 1;
+
+  // *Output-only* Time offset relative to the beginning of the audio,
+  // and corresponding to the end of the spoken word.
+  uint32 end_time_msec = 2;
+
+  // *Output-only* The word corresponding to this set of information.
+  string word = 3;
+
+  // *Output-only* Word confidence estimate.
+  float confidence = 4;
+
+  // *Output-only* List of phones constituting the current word.
+  repeated Phone phones = 5;
+
+  // *Output-only* Flag indicating that word containes personal information and was masked
+  bool anonymized = 6;
+}
+
+message PhraseSpottingResult {
+  string tag = 1;
+
+  string phrase = 2;
+
+  uint32 recognition_hypothesis_number = 3;
+
+  uint32 phrase_count_in_current_utterance = 4;
+
+  uint32 phrase_count_in_whole_stream = 5;
+
+  bool filler_phrase_detected = 6;
+  // Relative frequency of the phrase in the stream:
+  // phrase_count_in_whole_stream / total_words_in_transcript
+  float relative_phrase_frequency = 7;
+
+  float phrase_frequency_ratio = 8; // relative_phrase_frequency / relative_baseline_frequency
+}
+
+// Auxiliary metrics of the voice (e.g. loudness).
+message VoiceMetrics {
+  uint32 measurement_time_msec = 1;
+
+  float loudness_lufs = 2;
+
+  float speech_ratio = 3;
+
+  bool our_side_is_speaking = 4;
+}
+
+message ServiceMessage {
+  bool service_is_finalized = 1;
+
+  enum Status {
+    OK = 0;
+    ERROR_OTHER = 1;
+    ERROR_INVALID_REQUEST = 2;
+  }
+
+  Status status = 2;
+
+  repeated string metainfo = 3;
+}
+
+message CallDetectionResult {
+  oneof call_detection_result_type {
+    CallStartEvent call_start_event = 1;
+    CallEndEvent call_end_event = 2;
+    SoundContent sound_content = 3;
+  }
+}
+
+message CallStartEvent {
+  uint64 session_offset_msec = 1;
+}
+
+message CallEndEvent {
+  uint64 session_offset_msec = 1;
+
+  enum Reason {
+    UNDEFINED = 0;
+    TIMEOUT = 1;
+    NEW_CALL_REGISTERED = 2;
+  }
+
+  Reason reason = 2;
+}
+
+message SoundContent {
+  uint64 session_offset_msec = 1;
+
+  enum SoundContentType {
+    UNDEFINED = 0;
+    SILENCE = 1;
+    MUSIC = 2;
+    NOISE = 3;
+    VOICE = 4;
+    ABSOLUTE_SILENCE = 5;
+  }
+
+  SoundContentType sound_content_type = 2;
+}
