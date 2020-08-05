@@ -1,24 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { TextArea } from "./components/textarea/TextArea";
+import { data } from "./mocks/data";
+import { flatten } from "./lib/flatten";
+import { Transcripts } from "./containers/transcripts/Transcripts";
+
+const initialWords = ["hello", "how", "You", "span", "div"];
 
 function App() {
+  const [matchWords, setMatchWords] = useState(initialWords);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <header className="App-header">Process transcripts</header>
+      <main className="main">
+        <div className="transcripts">
+          <Transcripts transcripts={data} wordList={matchWords} />
+        </div>
+        <div className="match-words">
+          <TextArea
+            textList={matchWords}
+            onChange={(words) => {
+              const wordList = words.split("\n");
+              setMatchWords(flatten(wordList));
+            }}
+          />
+        </div>
+      </main>
     </div>
   );
 }
