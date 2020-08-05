@@ -12,16 +12,17 @@
 }
 
 .main {
-  max-width: 1024px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  max-width: 1024px;
+  margin: 0 auto;
 }
 
 .transcripts {
   grid-column: auto / span 6;
-  min-height: 500px;
+  height: 300px;
   margin: 1em;
+  overflow: scroll;
 }
 
 .match-words {
