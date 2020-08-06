@@ -5,7 +5,7 @@ import { data } from "./mocks/data";
 import { compact, cloneDeep } from "./lib/array";
 import { Transcripts } from "./containers/transcripts/Transcripts";
 import { ASRClient } from "./api/asr/ASRClient";
-import {} from "./lib/array";
+import { useScrollToBottom } from "./hooks/useScrollToBottom";
 
 const ASRInstance = new ASRClient("wss://vibe-rc.i2x.ai");
 
@@ -15,6 +15,8 @@ function App() {
   const [matchWords, setMatchWords] = useState(initialWords);
   const [transcripts, setTranscripts] = useState([data]);
   const [sessionStarted, setSessionStarted] = useState(false);
+
+  const [ref, setAutoScroll] = useScrollToBottom();
 
   const onSessionStart = (error, results) => {
     if (!error) {
@@ -52,7 +54,7 @@ function App() {
       <h1>{sessionStarted ? "Session started" : "No session"}</h1>
       <main>
         <div className="main">
-          <div className="transcripts">
+          <div className="transcripts" ref={ref}>
             {transcripts.map((sessionTranscript, idx) => (
               <Transcripts
                 key={idx}
@@ -70,10 +72,17 @@ function App() {
               }}
             />
           </div>
-          <div>
+          <div style={{ gridColumn: "auto / span 12" }}>
             <button onClick={toggleSession}>
               {sessionStarted ? "Stop session" : "Start Session"}
             </button>
+            <span style={{ marginLeft: 20 }}>
+              Auto scroll:{" "}
+              <input
+                type="checkbox"
+                onChange={(evt) => setAutoScroll(evt.target.checked)}
+              />
+            </span>
           </div>
         </div>
       </main>
