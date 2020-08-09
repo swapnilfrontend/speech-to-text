@@ -107,7 +107,7 @@ function App() {
               </div>
             </div>
             <div className="match-words">
-              <p>Phrases</p>
+              <p>Spotting Phrases</p>
               <Phrases />
             </div>
           </Flex>
