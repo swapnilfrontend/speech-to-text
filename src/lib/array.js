@@ -10,3 +10,7 @@ export const compact = (array) => {
 export const cloneDeep = (array) => {
   return JSON.parse(JSON.stringify(array));
 };
+
+export const deepEqual = (array1, array2) => {
+  return JSON.stringify(array1) === JSON.stringify(array2);
+};
