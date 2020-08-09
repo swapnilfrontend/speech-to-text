@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useASR } from "./api/useASR";
+import { useASR } from "./api/asr/useASR";
 import "./App.css";
 import { TextArea } from "./components/textarea/TextArea";
 import { Transcripts } from "./components/transcripts/Transcripts";
