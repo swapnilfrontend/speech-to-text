@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { transcripts, phrases, session } from "./reducers";
 import { SESSION_DISCONNECTED } from "./consts";
-import { data, intitialPhrases } from "../mocks/data";
+import { intitialPhrases } from "../mocks/data";
 
 const reducer = {
   transcripts,
@@ -10,7 +10,7 @@ const reducer = {
 };
 
 const preloadedState = {
-  transcripts: [data],
+  transcripts: [],
   phrases: intitialPhrases,
   session: SESSION_DISCONNECTED
 };

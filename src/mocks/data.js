@@ -1,4 +1,4 @@
-export const intitialPhrases = ["hello", "how", "You", "span", "div"];
+export const intitialPhrases = ["my name is", "product", "work"];
 
 export const data = [
   {
