@@ -9,14 +9,14 @@ import { useScrollToBottom } from "./hooks/useScrollToBottom";
 
 const ASRInstance = new ASRClient("wss://vibe-rc.i2x.ai");
 
-const initialWords = ["hello", "how", "You", "span", "div"];
+const intitialPhrases = ["hello", "how", "You", "span", "div"];
 
 function App() {
-  const [matchWords, setMatchWords] = useState(initialWords);
+  const [phrases, setPhrases] = useState(intitialPhrases);
   const [transcripts, setTranscripts] = useState([data]);
   const [sessionStarted, setSessionStarted] = useState(false);
 
-  const [ref, setAutoScroll] = useScrollToBottom();
+  const [ref] = useScrollToBottom(true);
 
   const onSessionStart = (error, results) => {
     if (!error) {
@@ -24,6 +24,7 @@ function App() {
         const newTranscriptions = cloneDeep(prevTranscripts);
         const last = newTranscriptions[newTranscriptions.length - 1];
         last.push(results);
+        console.log(results);
         return newTranscriptions;
       });
     }
@@ -32,7 +33,7 @@ function App() {
   const startSession = () => {
     setSessionStarted(true);
     transcripts.push([]);
-    ASRInstance.start(matchWords, onSessionStart);
+    ASRInstance.start(phrases, onSessionStart);
   };
 
   const stopSession = () => {
@@ -56,19 +57,18 @@ function App() {
         <div className="main">
           <div className="transcripts" ref={ref}>
             {transcripts.map((sessionTranscript, idx) => (
-              <Transcripts
-                key={idx}
-                transcripts={sessionTranscript}
-                wordList={matchWords}
-              />
+              <Transcripts key={idx} transcripts={sessionTranscript} />
             ))}
           </div>
           <div className="match-words">
             <TextArea
-              textList={matchWords}
+              textList={phrases}
               onChange={(words) => {
-                const wordList = words.split("\n");
-                setMatchWords(compact(wordList));
+                const newPhrases = words.split("\n");
+                setPhrases(compact(newPhrases));
+                if (ASRInstance.isStarted()) {
+                  ASRInstance.updateSpottingConfig(compact(newPhrases));
+                }
               }}
             />
           </div>
@@ -76,13 +76,6 @@ function App() {
             <button onClick={toggleSession}>
               {sessionStarted ? "Stop session" : "Start Session"}
             </button>
-            <span style={{ marginLeft: 20 }}>
-              Auto scroll:{" "}
-              <input
-                type="checkbox"
-                onChange={(evt) => setAutoScroll(evt.target.checked)}
-              />
-            </span>
           </div>
         </div>
       </main>

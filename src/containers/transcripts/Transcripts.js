@@ -3,37 +3,37 @@ import "./Transcripts.css";
 import { Highlighter } from "../../components/highlighter/Highlighter";
 
 const getTranscriptsMergedByTimestamp = (transcripts) => {
-  const mergedMessages = [];
+  const mergedResult = [];
 
-  transcripts.forEach(({ transcript }, idx) => {
+  transcripts.forEach((transcriptResult, idx) => {
     if (idx === 0) {
-      mergedMessages.push([transcript]);
+      mergedResult.push([transcriptResult]);
       return;
     }
-    const current = transcript;
+    const { transcript: current } = transcriptResult;
     const { transcript: previous } = transcripts[idx - 1];
     const offset = current.startOffsetMsec - previous.endOffsetMsec;
-    if (mergedMessages.length > 0 && offset <= 2000) {
-      const lastItem = mergedMessages[mergedMessages.length - 1];
-      lastItem.push(current);
+    if (mergedResult.length > 0 && offset <= 2000) {
+      const lastItem = mergedResult[mergedResult.length - 1];
+      lastItem.push(transcriptResult);
     } else {
-      mergedMessages.push([current]);
+      mergedResult.push([transcriptResult]);
     }
   });
-  return mergedMessages;
+  return mergedResult;
 };
 
-export const Transcripts = ({ transcripts = [], wordList }) => {
+export const Transcripts = ({ transcripts = [] }) => {
   const mergedMessages = getTranscriptsMergedByTimestamp(transcripts);
 
   return mergedMessages.map((mergedMessage, idx) => {
     return (
       <div className="transcript-text" key={idx}>
-        {mergedMessage.map((transcript, idx) => {
+        {mergedMessage.map(({ transcript, spotted }, idx) => {
           return (
             <Highlighter
               text={transcript.utterance}
-              wordsList={wordList}
+              wordsList={spotted}
               key={idx}
             />
           );
