@@ -1,6 +1,7 @@
 import React from "react";
 import "./Transcripts.css";
 import { Highlighter } from "../../components/highlighter/Highlighter";
+import { deepEqual } from "../../lib/array";
 
 const getTranscriptsMergedByTimestamp = (transcripts) => {
   const mergedResult = [];
@@ -23,24 +24,29 @@ const getTranscriptsMergedByTimestamp = (transcripts) => {
   return mergedResult;
 };
 
-export const Transcripts = ({ transcripts = [] }) => {
-  const mergedMessages = getTranscriptsMergedByTimestamp(transcripts);
+export const Transcripts = React.memo(
+  ({ transcripts = [] }) => {
+    const mergedMessages = getTranscriptsMergedByTimestamp(transcripts);
 
-  return mergedMessages.map((mergedMessage, idx) => {
-    return (
-      <div className="transcript-text" key={idx}>
-        {mergedMessage.map(({ transcript, spotted }, idx) => {
-          return (
-            <div className="speech-bubble" key={idx}>
-              <Highlighter
-                text={transcript.utterance}
-                wordsList={spotted}
-                key={idx}
-              />
-            </div>
-          );
-        })}
-      </div>
-    );
-  });
-};
+    return mergedMessages.map((mergedMessage, idx) => {
+      return (
+        <div className="transcript-text" key={idx}>
+          {mergedMessage.map(({ transcript, spotted }, idx) => {
+            return (
+              <div className="speech-bubble" key={idx}>
+                <Highlighter
+                  text={transcript.utterance}
+                  wordsList={spotted}
+                  key={idx}
+                />
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
+  },
+  (prevProps, nextProps) => {
+    return deepEqual(prevProps, nextProps);
+  }
+);
