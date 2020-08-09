@@ -7,7 +7,7 @@ export const compact = (array) => {
   });
 };
 
-export const cloneDeep = (array) => {
+export const deepClone = (array) => {
   return JSON.parse(JSON.stringify(array));
 };
 

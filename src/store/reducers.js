@@ -5,12 +5,12 @@ import {
   setSessionStatus,
   markTranscriptsStart as markTranscriptsSessionStart
 } from "./actions";
-import { cloneDeep, compact } from "../lib/array";
+import { deepClone, compact } from "../lib/array";
 import { SESSION_DISCONNECTED } from "./consts";
 
 export const transcripts = createReducer([], {
   [setTranscripts]: (state, { payload }) => {
-    const newTranscriptions = cloneDeep(state);
+    const newTranscriptions = deepClone(state);
     const last = newTranscriptions[newTranscriptions.length - 1];
     last.push(payload);
     return newTranscriptions;
