@@ -73,9 +73,11 @@ function App() {
   };
 
   const SessionButton = () => {
+    const buttonText =
+      sessionStatus === SESSION_STARTED ? "Stop Session" : "Start Session";
     return (
-      <button onClick={toggleSession}>
-        {sessionStatus === SESSION_STARTED ? "Stop session" : "Start Session"}
+      <button onClick={toggleSession} data-testid="manage-session-button">
+        {buttonText}
       </button>
     );
   };
@@ -83,7 +85,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">Process transcripts</header>
-      <h1>{`Session ${sessionStatus}`}</h1>
+      <h1 data-testid="session-status-heading">{`status: session ${sessionStatus}`}</h1>
       <main>
         <div className="main">
           <div className="transcripts" ref={ref}>

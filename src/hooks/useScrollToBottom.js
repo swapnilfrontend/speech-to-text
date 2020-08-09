@@ -4,7 +4,7 @@ export const useScrollToBottom = (shouldAutoScroll = false) => {
   let autoScroll = useRef(shouldAutoScroll);
   useEffect(() => {
     if (autoScroll.current) {
-      ref.scrollTo(0, ref.scrollHeight);
+      ref.scrollTo && ref.scrollTo(0, ref.scrollHeight);
     }
   });
 
