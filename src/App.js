@@ -1,26 +1,25 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useASR } from "./api/useASR";
 import "./App.css";
 import { TextArea } from "./components/textarea/TextArea";
-import { compact } from "./lib/array";
 import { Transcripts } from "./containers/transcripts/Transcripts";
-import { ASRClient } from "./api/asr/ASRClient";
 import { useScrollToBottom } from "./hooks/useScrollToBottom";
-import { useDispatch, useSelector } from "react-redux";
+import { compact } from "./lib/array";
 import {
-  setSessionStatus,
+  markTranscriptsStart,
   setPhrases,
-  setTranscripts,
-  markTranscriptsStart
+  setSessionStatus,
+  setTranscripts
 } from "./store/actions";
 import {
-  SESSION_ERRORED,
   SESSION_DISCONNECTED,
+  SESSION_ERRORED,
   SESSION_STARTED
 } from "./store/consts";
 
-const ASRInstance = new ASRClient("wss://vibe-rc.i2x.ai");
-
 function App() {
+  const ASRInstance = useASR();
   const dispatch = useDispatch();
   const sessionStatus = useSelector((state) => state.session);
   const phrases = useSelector((state) => state.phrases);
@@ -55,6 +54,33 @@ function App() {
     }
   };
 
+  const Phrases = () => {
+    const dispatch = useDispatch();
+    const ASRInstance = useASR();
+    const phrases = useSelector((state) => state.phrases);
+
+    return (
+      <TextArea
+        textList={phrases}
+        onChange={(words) => {
+          const newPhrases = words.split("\n");
+          dispatch(setPhrases(newPhrases));
+          if (ASRInstance.isStarted()) {
+            ASRInstance.updateSpottingConfig(compact(newPhrases));
+          }
+        }}
+      />
+    );
+  };
+
+  const SessionButton = () => {
+    return (
+      <button onClick={toggleSession}>
+        {sessionStatus === SESSION_STARTED ? "Stop session" : "Start Session"}
+      </button>
+    );
+  };
+
   return (
     <div className="App">
       <header className="App-header">Process transcripts</header>
@@ -67,23 +93,10 @@ function App() {
             ))}
           </div>
           <div className="match-words">
-            <TextArea
-              textList={phrases}
-              onChange={(words) => {
-                const newPhrases = words.split("\n");
-                dispatch(setPhrases(newPhrases));
-                if (ASRInstance.isStarted()) {
-                  ASRInstance.updateSpottingConfig(compact(newPhrases));
-                }
-              }}
-            />
+            <Phrases />
           </div>
           <div style={{ gridColumn: "auto / span 12" }}>
-            <button onClick={toggleSession}>
-              {sessionStatus === SESSION_STARTED
-                ? "Stop session"
-                : "Start Session"}
-            </button>
+            <SessionButton />
           </div>
         </div>
       </main>

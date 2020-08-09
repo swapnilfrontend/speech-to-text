@@ -5,13 +5,16 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { store } from "./store";
+import { ASRContext, asrClient } from "./api/useASR";
 
 ReactDOM.render(
-  <Provider store={store}>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </Provider>,
+  <ASRContext.Provider value={asrClient}>
+    <Provider store={store}>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </Provider>
+  </ASRContext.Provider>,
   document.getElementById("root")
 );
 
