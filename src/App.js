@@ -94,7 +94,7 @@ function App() {
       <main>
         <div className="main">
           <Heading1 data-testid="session-status-heading">
-            <span className="textXL">status:</span>{" "}
+            <span className="textXL">status:</span>
             {` session ${sessionStatus}`}
           </Heading1>
           <Flex>
