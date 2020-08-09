@@ -17,6 +17,9 @@ import {
   SESSION_ERRORED,
   SESSION_STARTED
 } from "./store/consts";
+import { PrimaryButton } from "./components/button/PrimaryButton";
+import { Heading1 } from "./components/typography/Typography";
+import { Flex } from "./components/flex/Flex";
 
 function App() {
   const ASRInstance = useASR();
@@ -76,27 +79,39 @@ function App() {
     const buttonText =
       sessionStatus === SESSION_STARTED ? "Stop Session" : "Start Session";
     return (
-      <button onClick={toggleSession} data-testid="manage-session-button">
+      <PrimaryButton
+        onClick={toggleSession}
+        data-testid="manage-session-button"
+      >
         {buttonText}
-      </button>
+      </PrimaryButton>
     );
   };
 
   return (
     <div className="App">
       <header className="App-header">Process transcripts</header>
-      <h1 data-testid="session-status-heading">{`status: session ${sessionStatus}`}</h1>
       <main>
         <div className="main">
-          <div className="transcripts" ref={ref}>
-            {transcripts.map((sessionTranscript, idx) => (
-              <Transcripts key={idx} transcripts={sessionTranscript} />
-            ))}
-          </div>
-          <div className="match-words">
-            <Phrases />
-          </div>
-          <div style={{ gridColumn: "auto / span 12" }}>
+          <Heading1 data-testid="session-status-heading">
+            <span className="textXL">status:</span>{" "}
+            {` session ${sessionStatus}`}
+          </Heading1>
+          <Flex>
+            <div>
+              <p>Transcript</p>
+              <div className="transcripts" ref={ref}>
+                {transcripts.map((sessionTranscript, idx) => (
+                  <Transcripts key={idx} transcripts={sessionTranscript} />
+                ))}
+              </div>
+            </div>
+            <div className="match-words">
+              <p>Phrases</p>
+              <Phrases />
+            </div>
+          </Flex>
+          <div className="session-button">
             <SessionButton />
           </div>
         </div>

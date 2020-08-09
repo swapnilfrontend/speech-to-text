@@ -31,11 +31,13 @@ export const Transcripts = ({ transcripts = [] }) => {
       <div className="transcript-text" key={idx}>
         {mergedMessage.map(({ transcript, spotted }, idx) => {
           return (
-            <Highlighter
-              text={transcript.utterance}
-              wordsList={spotted}
-              key={idx}
-            />
+            <div class="speech-bubble">
+              <Highlighter
+                text={transcript.utterance}
+                wordsList={spotted}
+                key={idx}
+              />
+            </div>
           );
         })}
       </div>

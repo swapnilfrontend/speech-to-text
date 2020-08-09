@@ -3,10 +3,41 @@
 }
 
 .transcript-text {
-  padding: 2em;
-  text-align: center;
-  background-color: #282c34;
   color: white;
   font-size: 1em;
-  border: 1px solid #282c34;
+  width: 350px;
+  background-color: #282c34;
+  margin: 2em auto;
+  border: 4px solid #00bfb6;
+  border-radius: 10px;
+  padding: 20px;
+  font-weight: 500;
+  font-family: arial;
+  position: relative;
+}
+
+.speech-bubble:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 10px solid transparent;
+  border-right: 10px solid #00bfb6;
+  border-top: 10px solid #00bfb6;
+  border-bottom: 10px solid transparent;
+  right: 20px;
+  bottom: -23px;
+}
+
+.speech-bubble:after {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 10px solid transparent;
+  border-right: 10px solid #282c34;
+  border-top: 10px solid #282c34;
+  border-bottom: 10px solid transparent;
+  right: 24px;
+  bottom: -13px;
 }

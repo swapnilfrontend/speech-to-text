@@ -1,0 +1,10 @@
+.btn.primary {
+  background: palevioletred;
+  color: white;
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.5em 1em;
+  border: 2px solid palevioletred;
+  border-radius: 3px;
+  cursor: pointer;
+}
