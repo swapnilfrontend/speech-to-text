@@ -1,10 +1,11 @@
 .transcript-text:not(:first-child) {
-  margin-top: 2em;
+  margin-top: 3em;
 }
 
 .transcript-text {
   color: white;
   font-size: 1em;
+  line-height: 1.5em;
   width: 350px;
   background-color: #282c34;
   margin: 2em auto;
