@@ -31,7 +31,7 @@ export const Transcripts = ({ transcripts = [] }) => {
       <div className="transcript-text" key={idx}>
         {mergedMessage.map(({ transcript, spotted }, idx) => {
           return (
-            <div class="speech-bubble">
+            <div className="speech-bubble" key={idx}>
               <Highlighter
                 text={transcript.utterance}
                 wordsList={spotted}
