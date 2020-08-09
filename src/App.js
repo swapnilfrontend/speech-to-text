@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useASR } from "./api/useASR";
 import "./App.css";
 import { TextArea } from "./components/textarea/TextArea";
-import { Transcripts } from "./containers/transcripts/Transcripts";
+import { Transcripts } from "./components/transcripts/Transcripts";
 import { useScrollToBottom } from "./hooks/useScrollToBottom";
 import { compact } from "./lib/array";
 import {
@@ -24,7 +24,6 @@ function App() {
   const sessionStatus = useSelector((state) => state.session);
   const phrases = useSelector((state) => state.phrases);
   const transcripts = useSelector((state) => state.transcripts);
-
   const [ref] = useScrollToBottom(true);
 
   const onSessionStart = (error, results) => {
