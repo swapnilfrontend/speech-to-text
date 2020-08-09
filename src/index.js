@@ -5,7 +5,10 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { store } from "./store";
-import { ASRContext, asrClient } from "./api/useASR";
+import { ASRContext } from "./api/asr/useASR";
+import { ASRClient } from "./api/asr/ASRClient";
+
+const asrClient = new ASRClient("wss://vibe-rc.i2x.ai");
 
 ReactDOM.render(
   <ASRContext.Provider value={asrClient}>
