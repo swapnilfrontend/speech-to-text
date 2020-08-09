@@ -1,48 +1,54 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
 import { TextArea } from "./components/textarea/TextArea";
-import { data } from "./mocks/data";
-import { compact, cloneDeep } from "./lib/array";
+import { compact } from "./lib/array";
 import { Transcripts } from "./containers/transcripts/Transcripts";
 import { ASRClient } from "./api/asr/ASRClient";
 import { useScrollToBottom } from "./hooks/useScrollToBottom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setSessionStatus,
+  setPhrases,
+  setTranscripts,
+  markTranscriptsStart
+} from "./store/actions";
+import {
+  SESSION_ERRORED,
+  SESSION_DISCONNECTED,
+  SESSION_STARTED
+} from "./store/consts";
 
 const ASRInstance = new ASRClient("wss://vibe-rc.i2x.ai");
 
-const intitialPhrases = ["hello", "how", "You", "span", "div"];
-
 function App() {
-  const [phrases, setPhrases] = useState(intitialPhrases);
-  const [transcripts, setTranscripts] = useState([data]);
-  const [sessionStarted, setSessionStarted] = useState(false);
+  const dispatch = useDispatch();
+  const sessionStatus = useSelector((state) => state.session);
+  const phrases = useSelector((state) => state.phrases);
+  const transcripts = useSelector((state) => state.transcripts);
 
   const [ref] = useScrollToBottom(true);
 
   const onSessionStart = (error, results) => {
-    if (!error) {
-      setTranscripts((prevTranscripts) => {
-        const newTranscriptions = cloneDeep(prevTranscripts);
-        const last = newTranscriptions[newTranscriptions.length - 1];
-        last.push(results);
-        console.log(results);
-        return newTranscriptions;
-      });
+    if (error) {
+      dispatch(setSessionStatus(SESSION_ERRORED));
+    } else {
+      dispatch(setTranscripts(results));
     }
   };
 
   const startSession = () => {
-    setSessionStarted(true);
-    transcripts.push([]);
+    dispatch(setSessionStatus(SESSION_STARTED));
+    dispatch(markTranscriptsStart());
     ASRInstance.start(phrases, onSessionStart);
   };
 
   const stopSession = () => {
     ASRInstance.stop();
-    setSessionStarted(false);
+    dispatch(setSessionStatus(SESSION_DISCONNECTED));
   };
 
   const toggleSession = () => {
-    if (sessionStarted) {
+    if (sessionStatus === SESSION_STARTED) {
       stopSession();
     } else {
       startSession();
@@ -52,7 +58,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">Process transcripts</header>
-      <h1>{sessionStarted ? "Session started" : "No session"}</h1>
+      <h1>{`Session ${sessionStatus}`}</h1>
       <main>
         <div className="main">
           <div className="transcripts" ref={ref}>
@@ -65,7 +71,7 @@ function App() {
               textList={phrases}
               onChange={(words) => {
                 const newPhrases = words.split("\n");
-                setPhrases(compact(newPhrases));
+                dispatch(setPhrases(newPhrases));
                 if (ASRInstance.isStarted()) {
                   ASRInstance.updateSpottingConfig(compact(newPhrases));
                 }
@@ -74,7 +80,9 @@ function App() {
           </div>
           <div style={{ gridColumn: "auto / span 12" }}>
             <button onClick={toggleSession}>
-              {sessionStarted ? "Stop session" : "Start Session"}
+              {sessionStatus === SESSION_STARTED
+                ? "Stop session"
+                : "Start Session"}
             </button>
           </div>
         </div>

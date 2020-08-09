@@ -1,3 +1,5 @@
+export const intitialPhrases = ["hello", "how", "You", "span", "div"];
+
 export const data = [
   {
     transcript: {
