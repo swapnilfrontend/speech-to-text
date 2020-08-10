@@ -110,4 +110,4 @@ App uses `css modules` for CSS and also utilizes CSS variables for theming(color
 
 ## CI
 
-Project uses github actions for running tests in CI
+Project uses github actions for running tests in CI - https://github.com/swapnilfrontend/speech-to-text/actions?query=workflow%3ATest
