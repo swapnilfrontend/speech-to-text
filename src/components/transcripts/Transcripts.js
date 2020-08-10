@@ -14,6 +14,8 @@ const getTranscriptsMergedByTimestamp = (transcripts) => {
     const { transcript: current } = transcriptResult;
     const { transcript: previous } = transcripts[idx - 1];
     const offset = current.startOffsetMsec - previous.endOffsetMsec;
+    // if the difference between current and previous transcript offset is less than equal to 2 secs
+    // we merge them into single array to display them in one speech bubble
     if (mergedResult.length > 0 && offset <= 2000) {
       const lastItem = mergedResult[mergedResult.length - 1];
       lastItem.push(transcriptResult);
