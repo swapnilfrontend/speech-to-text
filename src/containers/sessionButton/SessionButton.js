@@ -27,7 +27,7 @@ export const SessionButton = () => {
 
   const startSession = () => {
     ASRInstance.start(phrases, onSessionStart);
-    waitFor(ASRInstance.isStarted()).then(() => {
+    waitFor(() => ASRInstance.isStarted()).then(() => {
       dispatch(setSessionStatus(SESSION_STARTED));
       dispatch(markTranscriptsStart());
     });

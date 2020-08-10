@@ -2,7 +2,7 @@ export const waitFor = (condition) =>
   new Promise((resolve) => {
     function timer() {
       setTimeout(() => {
-        if (condition) {
+        if (condition()) {
           resolve();
         } else {
           timer();

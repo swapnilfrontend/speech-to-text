@@ -2,5 +2,7 @@ export const mockAsrClient = {
   start: () => {},
   stop: () => {},
   updateSpottingConfig: () => {},
-  isStarted: () => {}
+  isStarted: () => {
+    return true;
+  }
 };
