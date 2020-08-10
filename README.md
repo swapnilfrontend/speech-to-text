@@ -107,3 +107,7 @@ All the integration tests are stored in `cypress` folder at the root of applicat
 ## CSS
 
 App uses `css modules` for CSS and also utilizes CSS variables for theming(color).
+
+## CI
+
+Project uses github actions for running tests in CI
