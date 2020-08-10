@@ -1,68 +1,109 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Deployed application url
 
-## Available Scripts
+https://transcripts-processing.vercel.app/
 
-In the project directory, you can run:
+## Required dependencies
 
-### `yarn start`
+`nodejs`, `yarn` or `npm`
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Running the application
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+1. Run `yarn install` or `npm install`
+2. Run `yarn run start` or `npm run start`
+3. Open `localhost:3000`
 
-### `yarn test`
+## Running tests
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Assuming you have completed above steps.
 
-### `yarn build`
+### Unit tests
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`yarn run test` or `npm run test`
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+### Integration tests (uses Cypress)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Please note that cypress installation can take sometime. Also the e2e have not been CI ready at the moment so running them is a manual process for now.
 
-### `yarn eject`
+1. `yarn run e2e` or `npm run e2e`
+2. Select `app.test.js` from cypress app
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Building the application for production
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+`yarn run build` or `npm run build`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+This would produce a `build` folder containing all the static files which can be deployed using any statis server(such as `serve`) to run the application.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Building and running the application using Docker
 
-## Learn More
+Project can be build and run via docker (for details see `Dockerfile` in project root).
+It utilises multistep docker build so that image size small and optimized.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+From the root folder run:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+docker build -t i2x .
+docker run --rm -it  -p 3000:3000/tcp i2x:latest
+```
 
-### Code Splitting
+## Application architecture
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+- App uses react `hooks` which enables us to use functional components. Because of the usage of functional components I have tried to use `React.memo` HOC for implicit shallow comparison/memoization.
+- App uses dependency injection for `store` and `ASRClient` using `context` api of `react`. This makes unit testing easy with mocked data.
 
-### Analyzing the Bundle Size
+The basic structure of the app is given below:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+![](file-tree.png)
 
-### Making a Progressive Web App
+Most important directories inside `src` alongwith their definitions are:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+- `api` - contains `ASRClient`
+- `components` - contains pure UI reusable components
+- `containers` - components which uses `components` and contains store/api integration
+- `lib`- contains helper functions for various operations
+- `hooks` - contains any custom re-usable react hooks
+- `mocks` - mock that can be used for testing
+- `store` - contains `redux` related functions(`actions`, `reducers`)
 
-### Advanced Configuration
+- `App.js` - main file which combined `container` components to form the application
+- `index.js` - Initializes dependencies such as `store` and `ASRClient` - Renders `<App/>` using `ReactDom` and inject above dependencies which can accessed by any `container` components
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+Other directories/files
 
-### Deployment
+- `cypress` - contains integration tests using `cypress`
+- `Dockerfile` - docker `build` for the project
+- `public` - contains static assets and html file
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+## Libraries used
 
-### `yarn build` fails to minify
+App uses `create-react-app` and adds few more additional libs on top of it.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- `@reduxjs/toolkit` - for redux related functionalities such as `actions`, `reducer`, `store`
+- `react-redux` - for hooks based integration of redux such as `useSelector`, `useDispatch`
+- `@reach/router` - for routing
+- `jest` - for running unit tests
+- `@testing-library/react` - for unit testing components
+- `cypress` - for integration/e2e testing
+
+## Testing approach
+
+### Unit testing
+
+Unit testing has been done keeping in mind what is input to any component and what is output rather than trying to test implementations details.
+Components are fully mounted in all the tests and then the test resembles how the user would use them when they are shown as part of UI.
+
+`@testing-library/react` helps in acheiving that as it enforces all these best practices.
+
+It also uses mock for `ASRClient` in unit tests.
+
+All the unit tests are stored along with components i.e `component.test.js`
+
+### Integration/e2e testing
+
+App uses `cypress` to implement integration testing.
+Scenarios such as Start session, Stop session are tested but due an issue with browsers not able to simulate `getUserMedia` for audio streams, it was not possible to pass an audio stream to test audio rendering part.
+
+All the integration tests are stored in `cypress` folder at the root of application.
+
+## CSS
+
+App uses `css modules` for CSS and also utilizes CSS variables for theming(color).
