@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-// const appUrl = "https://i2x.vercel.app"
+// const appUrl = "https://transcripts-processing.vercel.app/"
 const appUrl = "http://localhost:3000";
 describe("Transcript processing app", () => {
   it("visits the app", () => {
