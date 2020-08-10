@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useScrollToBottom } from "../../hooks/useScrollToBottom";
 import { Transcripts as TranscriptsComponent } from "../../components/transcripts/Transcripts";
+import "./Transcripts.css";
 
 export const Transcripts = () => {
   const transcripts = useSelector((state) => state.transcripts);

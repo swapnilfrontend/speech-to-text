@@ -2,6 +2,7 @@ import React from "react";
 import "./Transcripts.css";
 import { Highlighter } from "../../components/highlighter/Highlighter";
 import { deepEqual } from "../../lib/array";
+import SpeechBubble from "../speechBubble/SpeechBubble";
 
 const getTranscriptsMergedByTimestamp = (transcripts) => {
   const mergedResult = [];
@@ -35,13 +36,13 @@ export const Transcripts = React.memo(
         <div className="transcript-text" key={idx}>
           {mergedMessage.map(({ transcript, spotted }, idx) => {
             return (
-              <div className="speech-bubble" key={idx}>
+              <SpeechBubble key={idx}>
                 <Highlighter
                   text={transcript.utterance}
                   wordsList={spotted}
                   key={idx}
                 />
-              </div>
+              </SpeechBubble>
             );
           })}
         </div>
