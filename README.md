@@ -24,8 +24,9 @@ Assuming you have completed above steps.
 
 Please note that cypress installation can take sometime. Also the e2e have not been CI ready at the moment so running them is a manual process for now.
 
-1. `yarn run e2e` or `npm run e2e`
-2. Select `app.test.js` from cypress app
+1. `yarn run start` or `npm run start`
+2. `yarn run e2e` or `npm run e2e`
+3. Select `app.test.js` from cypress app
 
 ## Building the application for production
 
