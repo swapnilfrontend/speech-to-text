@@ -50,6 +50,7 @@ docker run --rm -it  -p 3000:3000/tcp i2x:latest
 
 - App uses react `hooks` which enables us to use functional components. Because of the usage of functional components I have tried to use `React.memo` HOC for implicit shallow comparison/memoization.
 - App uses dependency injection for `store` and `ASRClient` using `context` api of `react`. This makes unit testing easy with mocked data.
+- App uses redux for state/data management.
 
 The basic structure of the app is given below:
 
