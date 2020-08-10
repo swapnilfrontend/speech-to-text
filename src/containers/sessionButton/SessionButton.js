@@ -9,6 +9,7 @@ import {
   setTranscripts,
   markTranscriptsStart
 } from "../../store/actions";
+import { waitFor } from "../../lib/waitFor";
 
 export const SessionButton = () => {
   const ASRInstance = useASR();
@@ -25,9 +26,11 @@ export const SessionButton = () => {
   };
 
   const startSession = () => {
-    dispatch(setSessionStatus(SESSION_STARTED));
-    dispatch(markTranscriptsStart());
     ASRInstance.start(phrases, onSessionStart);
+    waitFor(ASRInstance.isStarted()).then(() => {
+      dispatch(setSessionStatus(SESSION_STARTED));
+      dispatch(markTranscriptsStart());
+    });
   };
 
   const stopSession = () => {
