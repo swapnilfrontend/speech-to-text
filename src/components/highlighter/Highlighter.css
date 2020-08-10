@@ -1,3 +1,3 @@
 .highlight {
-  background-color: palevioletred;
+  background-color: var(--highlight-color);
 }

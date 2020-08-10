@@ -1,10 +1,10 @@
 .btn.primary {
-  background: palevioletred;
+  background: var(--primary-color);
   color: white;
   font-size: 1em;
   margin: 1em;
   padding: 0.5em 1em;
-  border: 2px solid palevioletred;
+  border: 2px solid var(--primary-color);
   border-radius: 3px;
   cursor: pointer;
 }
