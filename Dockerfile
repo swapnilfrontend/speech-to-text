@@ -2,7 +2,7 @@ FROM node:13 as build
 
 WORKDIR /app
 COPY ./ ./
-RUN yarn install
+RUN yarn install --production=true
 RUN yarn build
 
 FROM node:13-alpine

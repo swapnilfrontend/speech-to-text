@@ -4,9 +4,6 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.4.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^10.4.8",
-    "@testing-library/user-event": "^12.1.1",
     "protobufjs": "^6.10.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -36,6 +33,9 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^10.4.8",
+    "@testing-library/user-event": "^12.1.1",
     "@types/jest": "^26.0.9",
     "cypress": "^4.12.1"
   }
